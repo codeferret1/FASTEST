@@ -22,7 +22,7 @@ module AutoIt
     end
 
     def windows
-      AutoIt::Window.all.select do |w|
+      AutoIt::Window.all.select do |handle,w|
         w.process.pid == @pid
       end
     end
