@@ -1,3 +1,5 @@
+# vim: set ts=2 sw=2:
+
 module AutoIt
   # Window Class
   class Window
@@ -7,7 +9,7 @@ module AutoIt
 
     attr_reader :handle
 
-    def initialize (handle)
+    def initialize (handle=nil)
       @handle = handle
     end
 
@@ -39,7 +41,7 @@ module AutoIt
     end
 
     def restore
-      AutoIt::COM.WinS# search top-level and child windowsetState(handle_filter, "", AutoIt::COM.SW_RESTORE)
+      AutoIt::COM.WinSetState(handle_filter, "", AutoIt::COM.SW_RESTORE)
     end
 
     def state= (state)
@@ -200,6 +202,27 @@ module AutoIt
 
     def self.wait_not_exists (condition, options = {})
       wait_until("not .exists? and (#{condition})", options)
+    end
+
+    def self.method_missing(method, *args, &block)
+      if method =~ /\Afind_by_(\S+)\Z/
+        attribute = $1
+        if AutoIt::Window.new.respond_to? attribute
+          res = all.values.select { |w| eval("w.#{attribute} == args.first") }
+          case res.size
+          when 0
+            nil 
+          when 1
+            res.first 
+          else 
+            res
+          end
+        else
+          super
+        end
+      else
+        super
+      end
     end
 
     private
