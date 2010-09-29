@@ -9,7 +9,7 @@ module AutoIt
     attr_reader :pid, :ppid, :path, :name, :command_line
 
     def initialize (pid, ppid = nil, path = nil, name = nil, cmd_line = nil)
-         @pid = pid
+      @pid = pid
       @ppid = ppid
       @path = path
       @name = name
