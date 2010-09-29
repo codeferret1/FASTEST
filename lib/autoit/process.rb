@@ -26,6 +26,10 @@ module AutoIt
       end
     end
 
+    def self.my_console
+       Process.new(::Process.ppid).windows.values.first
+    end
+
     # refresh cached process list if older than X seconds (nil to avoid refresh)
     def self.all (cache_refresh = CACHE_TIME)
       if @@procs_cached.nil? or (not cache_refresh.nil? and (Time.now - @@procs_cached) >= cache_refresh)
