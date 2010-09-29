@@ -17,5 +17,8 @@ describe AutoIt::Window do
          all.should_not include("KnownTitle")
       end
    end
+   context "" do 
+
+   end
 end
 
