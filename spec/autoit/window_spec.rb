@@ -1,16 +1,6 @@
 require 'spec_helper'
 # vim: set ts=2 sw=2:
 
-
-class Util
-  def self.async_sys cmd
-    Thread.new (cmd) { |cmd|
-      system(cmd)
-    }
-  end
-end
-
-
 describe AutoIt::Window do
   before(:all) do 
     @fixtures = File.join(File.dirname(__FILE__),"..","fixtures")
