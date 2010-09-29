@@ -1,7 +1,6 @@
 module AutoIt
   # Window Class
   class Window
-    include Inspectable
 
     CACHE_TIME = 0.25
     @@wins_cached = nil
@@ -172,7 +171,7 @@ module AutoIt
       options = { :timeout => nil,
                   :polling => CACHE_TIME }.merge(options)
       start_time = Time.now
-      while (match = all(0).where(condition)).empty?
+      while (match = all(0).select(condition)).empty?
         sleep_time = options[:polling]
         unless options[:timeout].nil?
           end_time = start_time + options[:timeout]

@@ -1,8 +1,7 @@
 module AutoIt
-  
+
   # Process Class
   class Process
-    include Inspectable
 
     CACHE_TIME = 0.50
     @@procs_cached = nil
@@ -10,7 +9,7 @@ module AutoIt
     attr_reader :pid, :ppid, :path, :name, :command_line
 
     def initialize (pid, ppid = nil, path = nil, name = nil, cmd_line = nil)
-      @pid = pid
+         @pid = pid
       @ppid = ppid
       @path = path
       @name = name
@@ -18,7 +17,7 @@ module AutoIt
     end
 
     def parent
-      AutoIt::Process.all.first_where(".pid == #{@ppid}")
+      AutoIt::Process.all[@ppid]
     end
 
     def windows
