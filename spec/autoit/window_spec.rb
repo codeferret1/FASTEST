@@ -16,15 +16,16 @@ describe AutoIt::Window do
     @fixtures = File.join(File.dirname(__FILE__),"..","fixtures")
   end
   before(:each) do 
-    @console = AutoIt::Process.my_console
+    @console = AutoIt::Process.containing_window
+    puts @console
   end
   context "when listing windows" do 
     it "should list existing windows" do 
-      old_title = AutoIt::Process.my_console.title
-      AutoIt::Process.my_console.title = "KnownTitle"
+      old_title = @console.title
+      @console.title = "KnownTitle"
       all = AutoIt::Window::all.values.map { |w| w.title }
       all.should include("KnownTitle")
-      AutoIt::Process.my_console.title = old_title
+      @console.title = old_title
     end
     it "should not list windows that are gone" do 
       all = AutoIt::Window::all.values.map { |w| w.title }

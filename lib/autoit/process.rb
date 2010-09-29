@@ -26,8 +26,14 @@ module AutoIt
       end
     end
 
-    def self.my_console
-       Process.new(::Process.ppid).windows.values.first
+    def self.containing_window (pid = $$)
+      p = AutoIt::Process.all[pid]
+      return nil if p.nil?
+      p = p.parent
+      return nil if p.nil?
+      w = p.windows.values.first
+      return w unless w.nil?
+      containing_window(p.pid)
     end
 
     # refresh cached process list if older than X seconds (nil to avoid refresh)
