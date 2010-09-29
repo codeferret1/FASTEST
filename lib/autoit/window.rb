@@ -169,11 +169,11 @@ module AutoIt
       @@win_list
     end
 
-    def self.wait_until (condition, options = {})
+    def self.wait_until (options = {})
       options = { :timeout => nil,
                   :polling => CACHE_TIME }.merge(options)
       start_time = Time.now
-      while (match = all(0).select(condition)).empty?
+      while (match = all(0).select{ |h, w| yield(w) }).empty?
         sleep_time = options[:polling]
         unless options[:timeout].nil?
           end_time = start_time + options[:timeout]
@@ -184,24 +184,30 @@ module AutoIt
       match
     end
 
-    def self.wait_active (condition, options = {})
-      wait_until(".exists? and .active? and (#{condition})", options)
+    def self.wait_active (options = {})
+      wait_until(options) do |w|
+        w.exists? and w.active? and yield(w)
+      end
     end
 
-    def self.wait_not_active (condition, options = {})
-      wait_until(".exists? and not .active? and (#{condition})", options)
+    def self.wait_not_active (options = {})
+      wait_until(options) do |w|
+        w.exists? and not w.active? and yield(w)
+      end
     end
 
-    def self.wait_exists (condition, options = {})
-      wait_until(".exists? and (#{condition})", options)
+    def self.wait_exists (options = {})
+      wait_until(options) do |w|
+        w.exists? and yield(w)
+      end
     end
 
-    def self.wait (condition, options = {})
-      wait_exists(condition, options)
+    def self.wait (options = {})
+      wait_exists(options) { |w| yield(w) }
     end
 
-    def self.wait_not_exists (condition, options = {})
-      wait_until("not .exists? and (#{condition})", options)
+    def self.wait_not_exists (options = {})
+      wait_exists(options) { |w| not yield(w) }
     end
 
     def self.method_missing(method, *args, &block)
