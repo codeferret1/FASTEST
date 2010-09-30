@@ -7,7 +7,6 @@ describe AutoIt::Window do
   end
   before(:each) do 
     @console = AutoIt::Process.containing_window
-    puts @console
   end
   context "when listing windows" do 
     it "should list existing windows" do 
@@ -18,6 +17,7 @@ describe AutoIt::Window do
       @console.title = old_title
     end
     it "should not list windows that are gone" do 
+      @console.title = "SomeStrangeTitle"
       all = AutoIt::Window::all.values.map { |w| w.title }
       all.should_not include("KnownTitle")
     end

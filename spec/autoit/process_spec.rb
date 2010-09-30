@@ -1,3 +1,4 @@
+# vim: set ts=2 sw=2 :
 require 'spec_helper'
 
 describe AutoIt::Process do
@@ -118,8 +119,8 @@ describe AutoIt::Process do
       @proc.ppid.should be_nil
     end
 
-    it "should be orphan" do
-      @proc.should be_orphan
+    it "should be an orphan" do
+      @proc.should be_an_orphan
     end
   end
 
@@ -136,7 +137,8 @@ describe AutoIt::Process do
     end
 
     it "should not be possible for non-existent executables" do
-      @p.should_not be_nil
+      p = AutoIt::Process.run("C:\Wow\I\Am\Not\A\Path.exe", "bad_arg!")
+      p.should be_nil
     end
 
     it "should be possible for existing executables" do
