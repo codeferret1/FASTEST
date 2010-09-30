@@ -33,7 +33,7 @@ module AutoIt
     def children
       AutoIt::Process.all.select do |pid, p|
         p.parent == self
-      end.to_hash
+      end.to_h_from_kv
     end
 
     def ancestors 
@@ -48,7 +48,7 @@ module AutoIt
     def windows
       AutoIt::Window.all.select do |handle,w|
         w.process.pid == @pid
-      end.to_hash
+      end.to_h_from_kv
     end
 
     def to_s

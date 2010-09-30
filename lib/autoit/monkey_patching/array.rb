@@ -1,7 +1,6 @@
 class Array
-  def to_hash(&block)
-    Hash[*self.collect { |k, v|
-      [k, v]
-    }.flatten]
+  # to hash from key-value pairs
+  def to_h_from_kv
+    Hash[*self.flatten(1)]
   end
 end
