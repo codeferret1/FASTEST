@@ -211,7 +211,7 @@ module AutoIt
     end
 
     def self.method_missing(method, *args, &block)
-      if method =~ /\Afind_by_(\S+)\Z/
+      if method.to_s =~ /\Afind_by_(\S+)\Z/
         attribute = $1
         if AutoIt::Window.new.respond_to? attribute
           res = all.values.select { |w| eval("w.#{attribute} == args.first") }

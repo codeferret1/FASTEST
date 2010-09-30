@@ -59,14 +59,18 @@ describe AutoIt::Window do
       @plaything.should be_a AutoIt::Window
     end
 
-    after(:each) do
-      ::Process.kill(9, @plaything.process.pid) unless @plaything.nil?
-    end
-
     it "should die when killed" do 
       @plaything.kill 
       AutoIt::Window.find_by_title("PlayThing").should be_nil
     end
   end
+  context "when waiting for a window" do
+    context "to be active" do 
+      it "should return nil if it times out" do 
+        AutoIt::Window.wait_active(:timeout => 2) { |t| t.title == "PlayThing" }.should be_nil
+      end
+    end
+  end
+
 
 end
