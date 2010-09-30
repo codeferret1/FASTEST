@@ -19,10 +19,17 @@ GEM
       json (~> 1.4.6)
       term-ansicolor (~> 1.0.5)
       trollop (~> 1.16.2)
+    hoe (2.6.2)
+      rake (>= 0.8.7)
+      rubyforge (>= 2.0.4)
     json (1.4.6-x86-mingw32)
+    json_pure (1.4.6)
     open4 (1.0.1)
+    rake (0.8.7)
     rcov (0.9.9)
     rspec (1.3.0)
+    rubyforge (2.0.4)
+      json_pure (>= 1.1.7)
     term-ansicolor (1.0.5)
     trollop (1.16.2)
     win32console (1.3.0-x86-mingw32)
@@ -35,6 +42,7 @@ DEPENDENCIES
   ZenTest
   autotest
   cucumber
+  hoe
   rcov
   rspec
   win32console

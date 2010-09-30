@@ -1,7 +1,8 @@
 # -*- ruby -*-
 
 require 'rubygems'
-require 'hoe'
+require 'bundler'
+Bundler.require(:default, :test)
 
 Hoe.spec 'autoit' do
   developer('Mario Freitas', 'imkira@gmail.com')
