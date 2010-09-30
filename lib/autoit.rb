@@ -1,4 +1,8 @@
 
+require 'rubygems'
+require 'bundler'
+Bundler.require(:default)
+
 module AutoIt
   VERSION = '1.0.0'
 end
