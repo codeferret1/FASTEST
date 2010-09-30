@@ -42,6 +42,14 @@ describe AutoIt::Process do
       end
     end
 
+    it "should be printable" do
+      @procs.each do |pid,p|
+        s = p.to_s
+        s.should_not be_empty
+        s.should match(/Process.*Path.*CmdLine.*Parent/mi)
+      end
+    end
+
     it "should have oldest ancestor as the system or an already non-existent process" do
       @procs.each do |pid,p|
         next if p.ancestors.empty?
@@ -121,12 +129,6 @@ describe AutoIt::Process do
 
     it "should be an orphan" do
       @proc.should be_an_orphan
-    end
-
-    it "should be printable" do
-      s = @proc.to_s
-      s.should_not be_empty
-      s.should match(/Process.*Path.*CmdLine.*Parent/mi)
     end
   end
 
