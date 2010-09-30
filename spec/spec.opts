@@ -2,5 +2,5 @@
 --format
 nested
 --timeout
-60
+10
 
