@@ -1,3 +1,5 @@
+require 'time'
+
 module AutoIt
 
   # Process Class
@@ -6,11 +8,12 @@ module AutoIt
     CACHE_TIME = 0.50
     @@procs_cached = nil
 
-    attr_reader :pid, :ppid, :path, :name, :cmd_line
+    attr_reader :pid, :ppid, :created, :path, :name, :cmd_line
 
-    def initialize (pid, ppid = nil, path = nil, name = nil, cmd_line = nil)
+    def initialize (pid, ppid = nil, created = nil, path = nil, name = nil, cmd_line = nil)
       @pid = pid
       @ppid = ppid
+      @created = created
       @path = path
       @name = name
       @cmd_line = cmd_line
@@ -21,13 +24,20 @@ module AutoIt
     end
 
     def orphan?
-      running? and not AutoIt::Process.running?(@ppid)
+      return false unless running?
+      return true if parent.nil?
+      not AutoIt::Process.running?(@ppid)
     end
 
     def parent
       # system process?
       return nil if @ppid.nil?
-      AutoIt::Process.all[@ppid]
+      p = AutoIt::Process.all[@ppid]
+      return nil if p.nil?
+      # incorrectly referring to a process that reuses PID of a dead parent?
+      return nil if p.created > @created
+      # parent was created before child (as expected)
+      return p
     end
 
     def children
@@ -54,8 +64,10 @@ module AutoIt
     end
 
     def to_s
-      "Process\t[#{@pid},#{@name}]\n" \
+      "Process\t[#{@pid}]\n" \
+      "Name\t[#{@name}]\n" \
       "Path\t[#{@path}]\n" \
+      "Created\t[#{@created}]\n" \
       "CmdLine\t[#{@cmd_line}]\n" \
       "Parent\t[#{@ppid},#{parent.nil? ? '' : parent.name}]"
     end
@@ -66,7 +78,7 @@ module AutoIt
 
     def self.run (path, args = nil, options = {})
       options = { :workingdir => nil,
-                  :flag => nil
+        :flag => nil
       }.merge(options)
       args = [ args ].compact unless args.is_a? Array
       cmd = "\"#{path}\""
@@ -91,11 +103,17 @@ module AutoIt
       if @@procs_cached.nil? or (not cache_refresh.nil? and (Time.now - @@procs_cached) >= cache_refresh)
         procs = WIN32OLE.connect("winmgmts:{impersonationLevel=impersonate,(Debug)}\\\\.")
         @@proc_list = {}
+        # more info on the following link
+        # http://msdn.microsoft.com/en-us/library/aa394372(VS.85).aspx
         procs.InstancesOf("Win32_Process").each do |p|
           pid = p.ProcessId
           ppid = p.ParentProcessId
           ppid = nil if pid == 0
-          np = AutoIt::Process.new(pid, ppid, p.ExecutablePath, p.Name, p.CommandLine)
+          created = p.CreationDate
+          # fails for the system process
+          created = Time.parse(created) unless created.nil?
+          created = Time.at(0) if created.nil?
+          np = AutoIt::Process.new(pid, ppid, created, p.ExecutablePath, p.Name, p.CommandLine)
           @@proc_list[np.pid] = np
         end
         @@procs_cached = Time.now

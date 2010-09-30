@@ -46,7 +46,18 @@ describe AutoIt::Process do
       @procs.each do |pid,p|
         s = p.to_s
         s.should_not be_empty
-        s.should match(/Process.*Path.*CmdLine.*Parent/mi)
+        s.should match(/Process.*Name.*Path.*Created.*CmdLine.*Parent/mi)
+      end
+    end
+
+    it "should have no cycles when moving up in the ancestors chain" do
+      @procs.each do |pid,p|
+        p2 = p
+        visited = [ p2.pid ]
+        while not (p2 = p2.parent).nil?
+          visited.should_not include(p2.pid)
+          visited.push(p2.pid)
+        end 
       end
     end
 
@@ -55,22 +66,28 @@ describe AutoIt::Process do
         next if p.ancestors.empty?
         if p.ancestors.last.pid != 0
           p.ancestors.last.ppid.should_not be_nil
-          AutoIt::Process.should_not be_running(p.ancestors.last.ppid)
+          p.ancestors.last.should be_an_orphan
         end
       end
     end
 
-    it "should not include parents of orphan processes" do
+    it "should not include parent of orphan processes" do
       @procs.each do |pid,p|
         next unless p.orphan?
-        @procs.should_not include(p.ppid)
+        p.parent.should be_nil
+        next if p.ppid.nil?
+        # not running is the "general" case
+        next unless AutoIt::Process.running?(p.ppid)
+        # confirm that PID has been reused
+        @procs.should include(p.ppid)
+        @procs[p.ppid].created.should > p.created
       end
     end
 
-    it "should not have parents of orphan processes in running state" do
+    it "should have parents of non-orphan processes in running state" do
       @procs.each do |pid,p|
-        next if p.ppid.nil? or not p.orphan?
-        AutoIt::Process.should_not be_running(p.ppid)
+        next if p.orphan?
+        AutoIt::Process.should be_running(p.ppid)
       end
     end
 
