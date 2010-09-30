@@ -6,7 +6,7 @@ end
 # load all .rb files
 autoit = File.join(File.dirname(__FILE__), 'autoit', '**', '*.rb') 
 Dir.glob(autoit).each do |rb|
-  puts "Loading #{rb}..."
+  #puts "Loading #{rb}..."
   require rb
 end
 
