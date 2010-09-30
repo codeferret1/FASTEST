@@ -8,6 +8,7 @@ Hoe.spec 'autoit' do
   developer('Nicholas Green', 'FIXME')
 
   # self.rubyforge_name = 'autoitx' # if different than 'autoit'
+  self.rspec_options = ['--options', 'spec/spec.opts']
 end
 
 require 'spec/rake/verify_rcov'
