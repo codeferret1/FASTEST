@@ -31,9 +31,10 @@ module AutoIt
     end
 
     def children
-      AutoIt::Process.all.select do |pid, p|
+      c = AutoIt::Process.all.select do |pid, p|
         p.parent == self
-      end.to_h_from_kv
+      end
+      c.to_h_from_kv
     end
 
     def ancestors 
@@ -46,9 +47,10 @@ module AutoIt
     end
 
     def windows
-      AutoIt::Window.all.select do |handle,w|
+      wins = AutoIt::Window.all.select do |handle,w|
         w.process.pid == @pid
-      end.to_h_from_kv
+      end
+      wins.to_h_from_kv
     end
 
     def to_s

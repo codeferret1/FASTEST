@@ -122,6 +122,12 @@ describe AutoIt::Process do
     it "should be an orphan" do
       @proc.should be_an_orphan
     end
+
+    it "should be printable" do
+      s = @proc.to_s
+      s.should_not be_empty
+      s.should match(/Process.*Path.*CmdLine.*Parent/mi)
+    end
   end
 
   context "when running a new process" do
