@@ -58,6 +58,11 @@ describe AutoIt::Window do
       @plaything = AutoIt::Window.find_by_title("PlayThing")
       @plaything.should be_a AutoIt::Window
     end
+
+    after(:each) do
+      ::Process.kill(9, @plaything.process.pid) unless @plaything.nil?
+    end
+
     it "should die when killed" do 
       @plaything.kill 
       AutoIt::Window.find_by_title("PlayThing").should be_nil
