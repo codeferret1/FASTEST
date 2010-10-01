@@ -78,17 +78,16 @@ describe AutoIt::Window do
     end
   end
 
-  context "closing and killing windows" do
+  context "when closing and killing windows" do
     before(:each) do
       @pid = Util::async_sys(File.join(@fixtures,"PlayThing.exe"))
       @pid.should_not be_nil
-      sleep 0.5
-      @plaything = AutoIt::Window.find_by_title("PlayThing")
+      @plaything = AutoIt::Window.wait_exists(:timeout => 2) { |w| w.title == "PlayThing" }.values.first
     end
 
     it "should die when killed" do 
       @plaything.should be_a AutoIt::Window
-      @plaything.kill 
+      @plaything.kill
       AutoIt::Window.find_by_title("PlayThing").should be_nil
     end
   end
@@ -113,7 +112,8 @@ describe AutoIt::Window do
             @wins = AutoIt::Window.wait_active(:timeout => 2) { |w| w.title == "PlayThing" }
           end
 
-          it "should only find one window" do
+          it "should find exactly one window" do
+            @wins.should_not be_nil
             @wins.should have_exactly(1).items
           end
 
