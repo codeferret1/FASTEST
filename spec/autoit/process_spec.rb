@@ -7,6 +7,10 @@ describe AutoIt::Process do
     @fixtures = File.expand_path(File.join(File.dirname(__FILE__),"..","fixtures"))
   end
 
+  after(:each) do
+    ::Process.kill(9, @p.pid) unless @p.nil?
+  end
+
   context "when listing all processes" do
     before(:each) do
       @procs = AutoIt::Process.all
@@ -157,10 +161,6 @@ describe AutoIt::Process do
       @p = AutoIt::Process.run(@exec_path, @cmd_line)
     end
 
-    after(:each) do
-      ::Process.kill(9, @p.pid) unless @p.nil?
-    end
-
     it "should not be possible for non-existent executables" do
       p = AutoIt::Process.run("C:\Wow\I\Am\Not\A\Path.exe", "bad_arg!")
       p.should be_nil
@@ -208,10 +208,6 @@ describe AutoIt::Process do
       @p = AutoIt::Process.run(@exec_path)
     end
 
-    after(:each) do
-      ::Process.kill(9, @p.pid) unless @p.nil?
-    end
-
     it "should be possible get them" do
       sleep 0.5
       wins = @p.windows
@@ -227,10 +223,6 @@ describe AutoIt::Process do
     before(:each) do
       @exec_path = File.join(@fixtures,"KnownTitle.exe")
       @p = AutoIt::Process.run(@exec_path)
-    end
-
-    after(:each) do
-      ::Process.kill(9, @p.pid) unless @p.nil?
     end
 
     it "should have no windows associated" do
