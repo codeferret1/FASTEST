@@ -129,27 +129,27 @@ describe AutoIt::Process do
         ascend.call(p)
       end
     end
-  end
 
-  context "when checking the system process" do
-    before(:each) do
-      @proc = AutoIt::Process.all[0]
-    end
+    context "and checking for the system process" do
+      before(:each) do
+        @proc = @procs[0]
+      end
 
-    it "should exist" do
-      @proc.should_not be_nil
-    end
+      it "should exist" do
+        @proc.should_not be_nil
+      end
 
-    it "should contain the default name" do
-      @proc.name.should == "System Idle Process"
-    end
+      it "should contain the default name" do
+        @proc.name.should == "System Idle Process"
+      end
 
-    it "should not have parent" do
-      @proc.ppid.should be_nil
-    end
+      it "should not have parent" do
+        @proc.ppid.should be_nil
+      end
 
-    it "should be an orphan" do
-      @proc.should be_an_orphan
+      it "should be an orphan" do
+        @proc.should be_an_orphan
+      end
     end
   end
 
