@@ -239,7 +239,6 @@ describe AutoIt::Process do
 
       it "should have all windows refering to that process" do
         @wins.select do |h,w|
-          #puts w.process.inspect
           w.process.pid.should == @p.pid
         end
       end
