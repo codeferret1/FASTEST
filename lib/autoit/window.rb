@@ -3,6 +3,7 @@
 module AutoIt
   # Window Class
   class Window
+    extend Inspectable
 
     CACHE_TIME = 0.25
     @@wins_cached = nil
@@ -147,15 +148,15 @@ module AutoIt
       states << (maximized? ? "Maximized" : nil)
 
       "Window\t[#{handle}]\n" \
-      "Process\t[ID: #{process.pid}, Name: #{process.name}, Path: #{process.path}]\n" \
-      "Title\t[#{title.inspect}]\n" \
-      "Classes\t[#{classes.join(" -> ")}]\n" \
-      "Pos\t[#{pos.x},#{pos.y}]\n" \
-      "Size\t[#{size.w},#{size.h}]\n" \
-      "Client\t[#{client.size.w},#{client.size.h}]\n" \
-      "Text\t[#{text.inspect}]\n" \
-      "State\t[#{states.compact.join(", ")}]"# \
-      #"Children\t[#{children}]"
+        "Process\t[ID: #{process.pid}, Name: #{process.name}, Path: #{process.path}]\n" \
+        "Title\t[#{title.inspect}]\n" \
+          "Classes\t[#{classes.join(" -> ")}]\n" \
+            "Pos\t[#{pos.x},#{pos.y}]\n" \
+            "Size\t[#{size.w},#{size.h}]\n" \
+            "Client\t[#{client.size.w},#{client.size.h}]\n" \
+            "Text\t[#{text.inspect}]\n" \
+              "State\t[#{states.compact.join(", ")}]"# \
+              #"Children\t[#{children}]"
     end
 
     # refresh cached window list if older than X seconds (nil to avoid refresh)
@@ -171,7 +172,7 @@ module AutoIt
 
     def self.wait_until (options = {})
       options = { :timeout => nil,
-                  :polling => CACHE_TIME }.merge(options)
+        :polling => CACHE_TIME }.merge(options)
       start_time = Time.now
       while (match = all(0).select{ |h, w| yield(w) }).empty?
         sleep_time = options[:polling]
@@ -209,29 +210,6 @@ module AutoIt
     def self.wait_not_exists (options = {})
       wait_exists(options) { |w| not yield(w) }
     end
-
-    def self.method_missing(method, *args, &block)
-      if method.to_s =~ /\Afind_by_(\S+)\Z/
-        attribute = $1
-        if AutoIt::Window.new.respond_to? attribute
-          res = all.values.select { |w| eval("w.#{attribute} == args.first") }
-          case res.size
-          when 0
-            nil 
-          when 1
-            res.first 
-          else 
-            res
-          end
-        else
-          super
-        end
-      else
-        super
-      end
-    end
-
-    private
 
     def self.list (title = "", text = "")
       titles, handles = AutoIt::COM.WinList(title, text)

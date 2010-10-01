@@ -4,6 +4,7 @@ module AutoIt
 
   # Process Class
   class Process
+    extend Inspectable
 
     CACHE_TIME = 0.50
     @@procs_cached = nil
