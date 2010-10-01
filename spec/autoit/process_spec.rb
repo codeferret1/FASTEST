@@ -32,13 +32,6 @@ describe AutoIt::Process do
       end
     end
 
-    it "should include the current process" do  
-      @procs.should include(@my_pid)
-      my_proc = @procs[@my_pid]
-      my_proc.should_not be_nil
-      my_proc.name =~ /ruby/i
-    end
-
     it "should have all in running state" do
       @procs.each do |pid, p|
         p.should be_running
@@ -127,6 +120,24 @@ describe AutoIt::Process do
           end
         end
         ascend.call(p)
+      end
+    end
+
+    context "and checking for the current process" do
+      before(:each) do
+        @proc = @procs[@my_pid]
+      end
+
+      it "should exist" do
+        @proc.should_not be_nil
+      end
+
+      it "should contain 'ruby' in the name" do
+        @proc.name =~ /ruby/i
+      end
+
+      it "should contain 'ruby' in the path" do
+        @proc.path =~ /ruby/i
       end
     end
 
