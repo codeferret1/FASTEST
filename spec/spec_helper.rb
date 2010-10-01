@@ -1,8 +1,7 @@
 
 require 'rubygems'
 require 'bundler'
-Bundler.require(:test)
-
+Bundler.require(:default, :test)
 require 'autoit'
 
 class Util
