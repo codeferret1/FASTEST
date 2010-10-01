@@ -177,11 +177,11 @@ module AutoIt
         sleep_time = options[:polling]
         unless options[:timeout].nil?
           end_time = start_time + options[:timeout]
-          return nil if (Time.now + sleep_time) > end_time
+          return {} if (Time.now + sleep_time) > end_time
         end
         sleep(sleep_time)
       end
-      match
+      match.to_h_from_kv
     end
 
     def self.wait_active (options = {})
