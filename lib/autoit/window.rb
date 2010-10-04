@@ -8,6 +8,13 @@ module AutoIt
     CACHE_TIME = 0.25
     @@wins_cached = nil
 
+    STATE_EXISTS = 1
+    STATE_VISIBLE = 2
+    STATE_ENABLED = 4
+    STATE_ACTIVE = 8
+    STATE_MINIMIZED = 16
+    STATE_MAXIMIZED = 32
+
     attr_reader :handle
 
     def initialize (handle=nil)
@@ -25,7 +32,7 @@ module AutoIt
     end
 
     def visible= (flag)
-      return show if flag == true
+      return show if flag
       hide
     end
 
@@ -45,8 +52,9 @@ module AutoIt
       AutoIt::COM.WinSetState(handle_filter, "", AutoIt::COM.SW_RESTORE)
     end
 
-    def state= (state)
-      AutoIt::COM.WinSetState(handle_filter, "", state)
+    def always_on_top= (flag)
+      flag = flag ? 1 : 0
+      AutoIt::COM.WinSetState(handle_filter, "", flag)
     end
 
     def close
@@ -60,11 +68,15 @@ module AutoIt
     # properties
 
     def exists?
-      (state & 1) != 0
+      (state & AutoIt::Window::STATE_EXISTS) !=0
     end
 
     def visible?
-      (state & 2) != 0
+      (state & AutoIt::Window::STATE_VISIBLE) != 0
+    end
+
+    def enabled?
+      (state & AutoIt::Window::STATE_ENABLED) != 0
     end
 
     def active?
@@ -72,11 +84,11 @@ module AutoIt
     end
 
     def minimized?
-      (state & 16) != 0
+      (state & AutoIt::Window::STATE_MINIMIZED) != 0
     end
 
     def maximized?
-      (state & 32) != 0
+      (state & AutoIt::Window::STATE_MAXIMIZED) != 0
     end
 
     def classes
