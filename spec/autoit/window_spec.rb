@@ -4,9 +4,6 @@ require 'spec_helper'
 describe AutoIt::Window do
   before(:all) do 
     @fixtures = File.join(File.dirname(__FILE__),"..","fixtures")
-  end
-
-  before(:each) do 
     @console = AutoIt::Process.containing_window
   end
 
@@ -38,57 +35,86 @@ describe AutoIt::Window do
         s = w.to_s
         s.should_not be_empty
         s.should match(/Window.*Process.*Title.*Classes.*Pos.*Size.*Client.*Text.*State/mi)
-      end  
+      end
     end
   end
 
-  context "when hiding or showing a window" do 
-    it "should stop or start being visible" do 
-      @console.should be_visible
-      @console.visible=false
-      @console.should_not be_visible
-      @console.show
-      @console.should be_visible
-      @console.hide
-      @console.should_not be_visible
-      @console.visible=true
-      @console.should be_visible
-    end
-  end
-
-  context "when minimizing or maximizing a window" do 
-    it "should stop or start being minimized" do 
-      @console.maximize
-      @console.should be_maximized
-      @console.minimize
-      @console.should be_minimized
-      @console.maximize
-      @console.should be_maximized
-    end
-  end
-
-  context "when restoring a window" do 
-    it "should restore to its previous state" do 
-      @console.maximize
-      @console.should be_maximized
-      @console.minimize
-      @console.should_not be_maximized
-      @console.restore
-      @console.should be_maximized
-    end
-  end
-
-  context "when closing and killing windows" do
+  context "when a new window is opened" do
     before(:each) do
       @pid = Util::async_sys(File.join(@fixtures,"PlayThing.exe"))
       @pid.should_not be_nil
       @plaything = AutoIt::Window.wait_exists(:timeout => 2) { |w| w.title == "PlayThing" }.values.first
     end
 
-    it "should die when killed" do 
-      @plaything.should be_a AutoIt::Window
-      @plaything.kill
-      AutoIt::Window.find_by_title("PlayThing").should be_nil
+    it "should be contained in the window list" do
+      @plaything.should_not be_nil
+    end
+
+    context "and we change its title" do
+      before(:each) do
+        @plaything.title.should == "PlayThing"
+        @plaything.title = "SomeStrangeTitle"
+      end
+
+      it "should have its title changed" do  
+        @plaything.title.should == "SomeStrangeTitle"
+      end
+
+      it "should be reflected in the window list" do
+        all = AutoIt::Window::all.values.map { |w| w.title }
+        all.should_not include("KnownTitle")
+        all.should include("SomeStrangeTitle")
+      end
+    end
+
+    context "and we try hiding or showing it" do 
+      it "should stop or start being visible" do 
+        @plaything.should be_visible
+        @plaything.visible=false
+        @plaything.should_not be_visible
+        @plaything.show
+        @plaything.should be_visible
+        @plaything.hide
+        @plaything.should_not be_visible
+        @plaything.visible=true
+        @plaything.should be_visible
+      end
+    end
+
+    context "and we try minimizing or maximizing it" do 
+      it "should stop or start being minimized" do 
+        @plaything.maximize
+        @plaything.should be_maximized
+        @plaything.minimize
+        @plaything.should be_minimized
+        @plaything.maximize
+        @plaything.should be_maximized
+      end
+
+      it "should restore to its previous state" do 
+        @plaything.maximize
+        @plaything.should be_maximized
+        @plaything.minimize
+        @plaything.should_not be_maximized
+        @plaything.restore
+        @plaything.should be_maximized
+      end
+    end
+
+    context "and we close it" do
+      it "should be gone" do 
+        @plaything.should be_a AutoIt::Window
+        @plaything.close
+        AutoIt::Window.find_by_title("PlayThing").should be_nil
+      end
+    end
+
+    context "and we kill it" do
+      it "should be gone" do 
+        @plaything.should be_a AutoIt::Window
+        @plaything.kill
+        AutoIt::Window.find_by_title("PlayThing").should be_nil
+      end
     end
   end
 
