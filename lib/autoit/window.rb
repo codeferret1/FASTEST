@@ -116,9 +116,14 @@ module AutoIt
         :x => AutoIt::COM.WinGetPosX(handle_filter).to_i,
         :y => AutoIt::COM.WinGetPosY(handle_filter).to_i
       })
-      p.inspect
       p
     end
+
+    def pos= (x, y)
+      AutoIt::COM.WinMove(handle_filter, "", x, y, nil, nil)
+    end
+
+    alias :move :pos=
 
     def size
       OpenStruct.new({
@@ -126,6 +131,13 @@ module AutoIt
         :h => AutoIt::COM.WinGetPosHeight(handle_filter).to_i
       })
     end
+
+    def size= (w, h)
+      p = pos
+      AutoIt::COM.WinMove(handle_filter, "", p.x, p.y, w, h)
+    end
+
+    alias :resize :size=
 
     def client
       c = OpenStruct.new
