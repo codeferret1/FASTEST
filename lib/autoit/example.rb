@@ -13,7 +13,7 @@ class Foo
   before_filter(:func) do |call, *args|
     puts "#{call[:method]}'s #{call[:type]} filter called with #{args.inspect}"
   end
-
+  
   before_filter(:func) do |call, x, y, z|
     puts "Reversing order of arguments passed to func"
     call[:args] = [ z, y, x ]

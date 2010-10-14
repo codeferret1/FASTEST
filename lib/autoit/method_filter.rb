@@ -11,24 +11,26 @@
 module MethodFilter
   module ClassMethods
     private
-    def private_method_defined? (method)
-      private_instance_methods.map { |m| m.to_sym }.include?(method)
-    end
-
-    def filter_name (sym, type, counter)
-      "__#{sym}__#{type}_filter_#{counter}__".to_sym
-    end
 
     def filter (type, *syms, &block)
       syms.each do |sym|
-        cnt += 1 while private_method_defined?(filter = filter_name(sym, type, cnt ||= 0))
-        backup = (cnt != 0) ? filter_name(sym, type, cnt - 1) : sym
-        alias_method filter, backup 
-        private filter
-        puts "#{backup} will now call #{filter}"
-        define_method backup do |*args|
-          send type, sym, filter, *args, &block
-        end
+        @@__filters__ ||= { :before => {}, :after => {} }
+        @@__filters__.each_key { |k| @@__filters__[k][sym] ||= [] }
+        @@__filters__[type][sym] << block
+        filter = "__#{sym}__filter__".to_sym
+        return if private_instance_methods.map { |m| m.to_sym}.include?(filter)
+          alias_method filter, sym
+          private filter
+          define_method sym do |*args|
+            call = { :method => sym, :args => args }
+            @@__filters__[:before][sym].each do |b|
+              send :execute_filter, :before, call, &b
+              return call[:return] if call.has_key?(:return)
+            end
+            call[:return] = send filter, *call[:args] 
+            @@__filters__[:after][sym].each { |b| send :execute_filter, :after, call, &b }
+            return call[:return]
+          end
       end
     end
 
@@ -41,19 +43,10 @@ module MethodFilter
     end
   end
 
-  def before (method, filter, *args)
-    puts "before"
-    call = { :type => :before, :method => method, :args => args }
-    yield call, *args
-    return call[:return] if call.has_key?(:return)
-    send(filter, *call[:args])
-  end
-
-  def after (method, filter, *args)
-    puts "after"
-    call = { :type => :after, :method => method, :args => args, :return => send(filter, *args) }
-    yield call, *args
-    call[:return]
+  def execute_filter (type, call)
+    puts type
+    call.merge!({ :type => type })
+    yield call, *call[:args]
   end
 
   def self.included (base)
