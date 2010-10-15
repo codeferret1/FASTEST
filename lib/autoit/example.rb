@@ -1,4 +1,4 @@
-require './method_filter'
+require File.join(File.dirname(File.expand_path(__FILE__)),"method_filter")
 
 class Foo
   include MethodFilter
@@ -10,6 +10,15 @@ class Foo
     r
   end
 
+  after_filter(:func) do |call, x, y, z|
+    puts "Multiplying return value of func by 2"
+    call[:return] *= 2
+  end
+
+  after_filter(:func) do |call, *args|
+    puts "#{call[:method]}'s #{call[:type]} filter called with #{args.inspect}"
+  end
+
   before_filter(:func) do |call, *args|
     puts "#{call[:method]}'s #{call[:type]} filter called with #{args.inspect}"
   end
@@ -19,14 +28,6 @@ class Foo
     call[:args] = [ z, y, x ]
   end
 
-  after_filter(:func) do |call, x, y, z|
-    puts "Multiplying return value of func by 2"
-    call[:return] *= 2
-  end
-
-  after_filter(:func) do |call, *args|
-    puts "#{call[:method]}'s #{call[:type]} filter called with #{args.inspect}"
-  end
 end
 
 f = Foo.new
