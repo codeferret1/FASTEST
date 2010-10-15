@@ -102,6 +102,52 @@ describe AutoIt::Window do
       end
     end
 
+    context "and we move it" do
+      it "should be moved to the specified position" do
+        @plaything.move(0, 0)
+        p = @plaything.pos
+        p.x.should == 0
+        p.y.should == 0
+        p.x = 100
+        p.y = 50
+        @plaything.pos = p
+        p = @plaything.pos
+        p.x.should == 100
+        p.y.should == 50
+        @plaything.move([50, 100])
+        p = @plaything.pos
+        p.x.should == 50
+        p.y.should == 100
+        @plaything.pos = [100, 50]
+        p = @plaything.pos
+        p.x.should == 100
+        p.y.should == 50 
+      end
+    end
+
+    context "and we resize it" do
+      it "should be resized to the specified dimensions" do
+        @plaything.resize(800, 600)
+        s = @plaything.size
+        s.w.should == 800
+        s.h.should == 600
+        s.w = 500
+        s.h = 300
+        @plaything.size = s
+        s = @plaything.size
+        s.w.should == 500
+        s.h.should == 300
+        @plaything.resize([350, 400])
+        s = @plaything.size
+        s.w.should == 350
+        s.h.should == 400
+        @plaything.size = [705, 533]
+        s = @plaything.size
+        s.w.should == 705
+        s.h.should == 533
+      end
+    end
+
     context "and we close it" do
       it "should be gone" do 
         @plaything.should be_a AutoIt::Window

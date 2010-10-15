@@ -3,10 +3,14 @@ require File.join(File.dirname(__FILE__), 'autoit')
 
 before = Time.now
 
-wins = AutoIt::Window.wait_exists do |w|
+w = AutoIt::Window.wait_exists do |w|
   w.title =~ /Play/
-end
-wins.first.move(100,100)
+end.first
+
+p = w.size
+p.w += 200
+p.h += 50
+w.resize(p)
 
 #puts AutoIt::Window.wait(".process.name =~ /notepad/i", { :timeout => 3 })
 

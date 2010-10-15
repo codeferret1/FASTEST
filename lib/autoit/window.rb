@@ -4,6 +4,7 @@ module AutoIt
   # Window Class
   class Window
     extend Inspectable
+    include MethodFilter
 
     CACHE_TIME = 0.25
     @@wins_cached = nil
@@ -119,8 +120,8 @@ module AutoIt
       p
     end
 
-    def pos= (x, y)
-      AutoIt::COM.WinMove(handle_filter, "", x, y, nil, nil)
+    def pos= (p)
+      AutoIt::COM.WinMove(handle_filter, "", p[0], p[1], nil, nil)
     end
 
     alias :move :pos=
@@ -132,12 +133,24 @@ module AutoIt
       })
     end
 
-    def size= (w, h)
+    def size= (s)
       p = pos
-      AutoIt::COM.WinMove(handle_filter, "", p.x, p.y, w, h)
+      AutoIt::COM.WinMove(handle_filter, "", p.x, p.y, s[0], s[1])
     end
 
     alias :resize :size=
+
+    before_filter(:pos=, :move, :size=, :resize) do |call, *args|
+      if args.size == 2
+        call[:args] = [[args[0], args[1]]] 
+      elsif args[0].is_a? OpenStruct
+        if args[0].respond_to?(:x=)
+          call[:args] = [[args[0].x, args[0].y]]
+        else
+          call[:args] = [[args[0].w, args[0].h]]
+        end
+      end
+    end
 
     def client
       c = OpenStruct.new
