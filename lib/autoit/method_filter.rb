@@ -11,30 +11,35 @@
 module MethodFilter
   module ClassMethods
     def remove_filter (type, *syms)
-      @@__filters__ ||= { :before => {}, :after => {} }
-      syms.each { |sym| @@__filters__[type][sym] = [] }
+      syms.each { |sym| __filters__[type][sym] = [] }
+    end
+
+    def __filters__
+      return class_variable_get(:@@__filters__) if class_variable_defined?(:@@__filters__)
+      class_variable_set(:@@__filters__, {:before => {}, :after => {}})
     end
 
     private
 
     def filter (type, *syms, &block)
       syms.each do |sym|
-        @@__filters__ ||= { :before => {}, :after => {} }
-        @@__filters__.each_key { |k| @@__filters__[k][sym] ||= [] }
-        @@__filters__[type][sym] << block
+        __filters__.each_key { |k| __filters__[k][sym] ||= [] }
+        __filters__[type][sym] << block
         filter = "__#{sym}__filter__".to_sym
         next if private_instance_methods.map { |m| m.to_sym }.include?(filter)
         alias_method filter, sym
         private filter
         define_method sym do |*args|
-          call = { :method => sym, :args => args }
-          @@__filters__[:before][sym].each do |b|
+          call = { :method => sym, :args => args, :instance => self }
+          self.class.__filters__[:before][sym].each do |b|
             send :execute_filter, :before, call, &b
-            return call[:return] if call.has_key?(:return)
+            break if call.has_key?(:return)
           end
-          call[:return] = send filter, *call[:args] 
-          @@__filters__[:after][sym].each { |b| send :execute_filter, :after, call, &b }
-          return call[:return]
+          unless call.has_key?(:return)
+            call[:return] = send filter, *call[:args] 
+            self.class.__filters__[:after][sym].each { |b| send :execute_filter, :after, call, &b }
+          end
+          call[:return]
         end
       end
     end
