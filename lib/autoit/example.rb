@@ -21,16 +21,23 @@ class Foo
 
   before_filter(:func) do |call, *args|
     puts "#{call[:method]}'s #{call[:type]} filter called with #{args.inspect}"
+    # if you want to exit the filters chain and return a value immediately,
+    # you can define call[:return] to something (including nil) and that will
+    # be returned to the caller.
   end
   
   before_filter(:func) do |call, x, y, z|
     puts "Reversing order of arguments passed to func"
     call[:args] = [ z, y, x ]
   end
-
 end
 
 f = Foo.new
+puts "ALL filters enabled"
 puts f.func(1,2,3)
-
-
+puts "AFTER filters disabled"
+Foo.remove_filter(:after, :func)
+puts f.func(1,2,3)
+puts "ALL filters disabled"
+Foo.remove_filter(:before, :func)
+puts f.func(1,2,3)

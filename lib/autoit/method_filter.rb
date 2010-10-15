@@ -3,13 +3,18 @@
 # http://refactormycode.com/codes/656-method-hooks-in-ruby-any-cleaner
 #
 # Main changes:
-# - Removed Ruby version test (still works for Ruby 1.8 and 1.9)
-# - Support not only "after" but also "before" hooks.%
-# - Allow multiple filters to be installed (no support for uninstalling)
-# - Transformed "hooks" into "filters"
+# - Removed Ruby version test (Ruby 1.8 and 1.9 both work).
+# - Support not only "after" but also "before" hooks.
+# - Transformed "hooks" into "filters" (allow changing of args, and return values).
+# - Allow multiple filters to be installed and uninstalled.
 #
 module MethodFilter
   module ClassMethods
+    def remove_filter (type, *syms)
+      @@__filters__ ||= { :before => {}, :after => {} }
+      syms.each { |sym| @@__filters__[type][sym] = [] }
+    end
+
     private
 
     def filter (type, *syms, &block)
@@ -18,7 +23,7 @@ module MethodFilter
         @@__filters__.each_key { |k| @@__filters__[k][sym] ||= [] }
         @@__filters__[type][sym] << block
         filter = "__#{sym}__filter__".to_sym
-        return if private_instance_methods.map { |m| m.to_sym}.include?(filter)
+        next if private_instance_methods.map { |m| m.to_sym }.include?(filter)
         alias_method filter, sym
         private filter
         define_method sym do |*args|
