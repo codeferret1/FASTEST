@@ -41,9 +41,10 @@ describe AutoIt::Window do
 
   context "when a new window is opened" do
     before(:each) do
+      AutoIt::Window.all.values.select { |w| w.title == "PlayThing" }.should be_empty
       @pid = Util::async_sys(File.join(@fixtures,"PlayThing.exe"))
       @pid.should_not be_nil
-      @plaything = AutoIt::Window.wait_exists(:timeout => 2) { |w| w.title == "PlayThing" }.values.first
+      @plaything = AutoIt::Window.wait_exists(:timeout => 2) { |w| w.title == "PlayThing" }.first
     end
 
     it "should be contained in the window list" do
@@ -145,12 +146,12 @@ describe AutoIt::Window do
 
           it "should not timeout" do
             @wins.should_not be_empty
-            @wins.each { |h, w| w.should_not be_nil }
+            @wins.each { |w| w.should_not be_nil }
           end
 
           it "should be active" do
             @wins.should_not be_empty
-            @wins.each { |h, w| w.should be_active }
+            @wins.each { |w| w.should be_active }
           end
         end
 
@@ -172,12 +173,12 @@ describe AutoIt::Window do
 
           it "should not timeout" do
             @wins.should_not be_empty
-            @wins.each { |h, w| w.should_not be_nil }
+            @wins.each { |w| w.should_not be_nil }
           end
 
           it "should be active" do
             @wins.should_not be_empty
-            @wins.each { |h, w| w.should be_active }
+            @wins.each { |w| w.should be_active }
           end
         end
       end

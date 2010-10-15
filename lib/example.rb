@@ -3,11 +3,10 @@ require File.join(File.dirname(__FILE__), 'autoit')
 
 before = Time.now
 
-w = AutoIt::Window.match_by_title_and_text(/Play/, //)
-puts w.inspect
-
-p = AutoIt::Process.find_by_pid(0)
-puts p.inspect
+wins = AutoIt::Window.wait_exists do |w|
+  w.title =~ /Play/
+end
+wins.first.move(100,100)
 
 #puts AutoIt::Window.wait(".process.name =~ /notepad/i", { :timeout => 3 })
 
