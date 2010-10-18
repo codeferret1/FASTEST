@@ -177,6 +177,15 @@ describe AutoIt::Process do
         p = AutoIt::Process.run("C:\Wow\I\Am\Not\A\Path.exe", "bad_arg!")
         p.should be_nil
       end
+
+      context "and we inspect the process list" do
+        it "should not be contained in it" do
+          p = AutoIt::Process.find_all_by_path("C:\Wow\I\Am\Not\A\Path.exe")
+          p.should be_empty
+          p = AutoIt::Process.find_all_by_cmd_line("bad_arg!")
+          p.should be_empty
+        end
+      end
     end
 
     context "for an existent executable" do
@@ -214,6 +223,23 @@ describe AutoIt::Process do
         expected_cmd_line = @exec_path.gsub("\\", "/")
         expected_cmd_line = "\"#{expected_cmd_line}\" #{@cmd_line_str}"
         p_cmd_line.should == expected_cmd_line
+      end
+
+      context "and we inspect the process list" do
+        it "should be contained in it" do
+          p = AutoIt::Process.find_all_by_path(@p.path)
+          p.should have_exactly(1).items
+          p[0].pid.should == @p.pid
+          p[0].path.should == @p.path
+          p = AutoIt::Process.find_all_by_cmd_line(@p.cmd_line)
+          p.should have_exactly(1).items
+          p[0].pid.should == @p.pid
+          p[0].cmd_line.should == @p.cmd_line
+          p = AutoIt::Process.find_by_pid_and_name(@p.pid, @p.name)
+          p.should_not be_nil 
+          p.pid.should == @p.pid
+          p.name.should == @p.name
+        end
       end
     end
   end

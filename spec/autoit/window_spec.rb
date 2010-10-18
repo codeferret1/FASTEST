@@ -152,7 +152,7 @@ describe AutoIt::Window do
       it "should be gone" do 
         @plaything.should be_a AutoIt::Window
         @plaything.close
-        AutoIt::Window.find_by_title("PlayThing").should be_nil
+        AutoIt::Window.all.values.select { |w| w.title == "PlayThing" }.should be_empty
       end
     end
 
@@ -160,7 +160,25 @@ describe AutoIt::Window do
       it "should be gone" do 
         @plaything.should be_a AutoIt::Window
         @plaything.kill
-        AutoIt::Window.find_by_title("PlayThing").should be_nil
+        AutoIt::Window.all.values.select { |w| w.title == "PlayThing" }.should be_empty
+      end
+    end
+
+    context "and we inspect the window list" do
+      it "should be contained in it" do
+        p = AutoIt::Window.find_all_by_title(@plaything.title)
+        p.should have_exactly(1).items
+        p[0].process.pid == @plaything.process.pid
+        p[0].title.should == @plaything.title
+        p = AutoIt::Window.match_all_by_title(Regexp.new(@plaything.title))
+        p.should have_exactly(1).items
+        p[0].process.pid == @plaything.process.pid
+        p[0].title.should == @plaything.title
+        p = AutoIt::Window.find_by_title_and_size(@plaything.title, @plaything.size)
+        p.should_not be_nil
+        p.process.pid == @plaything.process.pid
+        p.title.should == @plaything.title
+        p.size.should == @plaything.size
       end
     end
   end
