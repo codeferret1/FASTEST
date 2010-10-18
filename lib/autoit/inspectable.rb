@@ -17,21 +17,16 @@ module Inspectable
   private
 
   def inspectable_delegator (method_suffix, matcher, *args, &block)
-    unless method_suffix.to_s =~ /\A((all|first|last)_)?by_(\S+)\Z/
-      return nil
-    end
-    attributes = $3.split("_and_")
-    im = self.instance_methods
-    attributes.each { |a| return nil unless im.include?(a) }
+    return nil unless method_suffix.to_s =~ /\A((all|first|last)_)?by_(\S+)\Z/
     selector = $2
     selector ||= "smart"
-    selector = selector.to_sym
-    res = all.values.select do |w|
+    attributes = $3.split("_and_").map { |m| m.to_sym }
+    res = find_all.select do |w|
       not attributes.each_index do |i|
         break nil unless w.send(attributes[i]).send(matcher, args[i], &block)
       end.nil?
     end
-    case selector
+    case selector.to_sym
     when :first
       [res.first]
     when :last
@@ -50,4 +45,3 @@ module Inspectable
     end
   end
 end
-

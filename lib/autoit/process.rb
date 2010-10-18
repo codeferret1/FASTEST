@@ -66,11 +66,11 @@ module AutoIt
 
     def to_s
       "Process\t[#{@pid}]\n" \
-      "Name\t[#{@name}]\n" \
-      "Path\t[#{@path}]\n" \
-      "Created\t[#{@created}]\n" \
-      "CmdLine\t[#{@cmd_line}]\n" \
-      "Parent\t[#{@ppid},#{parent.nil? ? '' : parent.name}]"
+        "Name\t[#{@name}]\n" \
+          "Path\t[#{@path}]\n" \
+            "Created\t[#{@created}]\n" \
+              "CmdLine\t[#{@cmd_line}]\n" \
+                "Parent\t[#{@ppid},#{parent.nil? ? '' : parent.name}]"
     end
 
     def self.running? (pid)
@@ -122,6 +122,9 @@ module AutoIt
       @@proc_list
     end
 
+    def self.find_all
+      all.values
+    end
   end
 end
 

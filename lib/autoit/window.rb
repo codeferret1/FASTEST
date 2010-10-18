@@ -207,6 +207,10 @@ module AutoIt
       @@win_list
     end
 
+    def self.find_all
+      all.values
+    end
+
     def self.wait_until (options = {})
       options = { :timeout => nil,
         :polling => CACHE_TIME }.merge(options)
