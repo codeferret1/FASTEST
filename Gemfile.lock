@@ -47,5 +47,6 @@ DEPENDENCIES
   hoe
   rcov
   rspec
+  win32-api
   win32-process
   win32console

@@ -11,4 +11,5 @@ group :test do
 end
 
 gem "hoe"
+gem "win32-api", :require => "win32/api"
 
