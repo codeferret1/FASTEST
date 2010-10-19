@@ -101,7 +101,7 @@ describe AutoIt::Process do
         expand = lambda do |p, e|
           e.should_not include(p.pid)
           e[p.pid] = p
-          p.children.each_value { |c| expand.call(c, e) }
+          p.children.each { |c| expand.call(c, e) }
         end
         e = expand.call(p, {})
       end
@@ -258,13 +258,13 @@ describe AutoIt::Process do
       end
 
       it "should contain a window with the main title" do
-        @wins.select do |h,w|
+        @wins.select do |w|
           w.title == "PlayThing"
         end.should_not be_empty
       end
 
       it "should have all windows refering to that process" do
-        @wins.select do |h,w|
+        @wins.select do |w|
           w.process.pid.should == @p.pid
         end
       end

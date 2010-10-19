@@ -7,18 +7,20 @@ Bundler.require(:default, :test)
 Hoe.spec 'autoit' do
   developer('Mario Freitas', 'imkira@gmail.com')
   developer('Nicholas Green', 'FIXME')
-
-  # self.rubyforge_name = 'autoitx' # if different than 'autoit'
-  self.rspec_options = ['--options', 'spec/spec.opts']
 end
 
-require 'spec/rake/verify_rcov'
+require 'rspec/core/rake_task'
 
-desc "Run all specs with RCov"
-Spec::Rake::SpecTask.new('spec:rcov') do |t|
-  t.spec_files = FileList['spec/**/*_spec.rb']
+RSpec::Core::RakeTask.new(:spec) do |t|
+  t.rspec_opts = '--colour --format nested'
+  t.pattern = 'spec/**/*_spec.rb'
+end
+
+RSpec::Core::RakeTask.new('spec:rcov') do |t|
   t.rcov = true
-  t.rcov_opts = ['--exclude', '^spec']
+  t.rcov_opts = '--exclude spec/'
+  t.rspec_opts = '--colour --format nested'
+  t.pattern = 'spec/**/*_spec.rb'
 end
 
 # vim: syntax=ruby

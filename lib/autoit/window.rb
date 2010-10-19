@@ -19,7 +19,7 @@ module AutoIt
     attr_reader :handle
 
     def initialize (handle=nil)
-      @handle = handle
+      @handle = handle.hex
     end
 
     # actions
@@ -92,12 +92,11 @@ module AutoIt
       (state & AutoIt::Window::STATE_MAXIMIZED) != 0
     end
 
-    def classes
-      AutoIt::COM.WinGetClassList(handle_filter).split("\n")
-    end
-
-    def has_class? (c)
-      classes.include?(c)
+    def class_name
+      @@__User32GetClassName__ ||= Win32::API.new('GetClassName', 'LPI', 'I', 'user32')
+      tmp = "\0" * 256
+      @@__User32GetClassName__.call(handle, tmp, tmp.size - 1)
+      tmp.rstrip
     end
 
     def title
@@ -110,6 +109,27 @@ module AutoIt
 
     def text
       AutoIt::COM.WinGetText(handle_filter)
+    end
+
+    def parent
+      @@__User32GetParent__ ||= Win32API.new('user32','GetParent','L','L')
+      p = @@__User32GetParent__.call(handle)
+      p = AutoIt::Window.all[p]
+    end
+
+    def children
+      c = AutoIt::Window.all.values.select do |handle, w|
+        w.parent == self
+      end
+    end
+
+    def ancestors 
+      ps = []
+      p = self
+      while not (p = p.parent).nil?
+        ps.push(p)
+      end
+      ps
     end
 
     def pos
@@ -184,16 +204,17 @@ module AutoIt
       states << (minimized? ? "Minimized" : nil)
       states << (maximized? ? "Maximized" : nil)
 
-      "Window\t[#{handle}]\n" \
-        "Process\t[ID: #{process.pid}, Name: #{process.name}, Path: #{process.path}]\n" \
-        "Title\t[#{title.inspect}]\n" \
-          "Classes\t[#{classes.join(" -> ")}]\n" \
-            "Pos\t[#{pos.x},#{pos.y}]\n" \
-            "Size\t[#{size.w},#{size.h}]\n" \
-            "Client\t[#{client.size.w},#{client.size.h}]\n" \
-            "Text\t[#{text.inspect}]\n" \
-              "State\t[#{states.compact.join(", ")}]"# \
-              #"Children\t[#{children}]"
+      "Window\t[#{handle.to_s(16)}]\n" \
+      "Process\t[ID: #{process.pid}, Name: #{process.name}, Path: #{process.path}]\n" \
+      "Title\t[#{title.inspect}]\n" \
+      "Class\t[#{class_name}]\n" \
+      "Pos\t[#{pos.x},#{pos.y}]\n" \
+      "Size\t[#{size.w},#{size.h}]\n" \
+      "Client\t[#{client.size.w},#{client.size.h}]\n" \
+      "Text\t[#{text.inspect}]\n" \
+      "State\t[#{states.compact.join(", ")}]\n" \
+      "Parent\t[#{parent.nil? ? "" : parent.handle.to_s(16)}]\n"
+      #"Children\t[#{children}]"
     end
 
     # refresh cached window list if older than X seconds (nil to avoid refresh)
@@ -215,7 +236,7 @@ module AutoIt
       options = { :timeout => nil,
         :polling => CACHE_TIME }.merge(options)
       start_time = Time.now
-      while (match = all(0).select{ |h, w| yield(w) }).empty?
+      while (match = all(0).values.select{ |w| yield(w) }).empty?
         sleep_time = options[:polling]
         unless options[:timeout].nil?
           end_time = start_time + options[:timeout]
@@ -223,7 +244,7 @@ module AutoIt
         end
         sleep(sleep_time)
       end
-      match.to_h_from_kv.values
+      match
     end
 
     def self.wait_active (options = {})
@@ -263,7 +284,7 @@ module AutoIt
     end
 
     def handle_filter
-      "[HANDLE:#{@handle}]"
+      "[HANDLE:#{@handle.to_s(16)}]"
     end
   end
 end

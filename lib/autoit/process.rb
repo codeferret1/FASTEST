@@ -42,10 +42,9 @@ module AutoIt
     end
 
     def children
-      c = AutoIt::Process.all.select do |pid, p|
+      c = AutoIt::Process.all.values.select do |p|
         p.parent == self
       end
-      c.to_h_from_kv
     end
 
     def ancestors 
@@ -58,19 +57,18 @@ module AutoIt
     end
 
     def windows
-      wins = AutoIt::Window.all.select do |handle,w|
+      wins = AutoIt::Window.all.values.select do |w|
         w.process.pid == @pid
       end
-      wins.to_h_from_kv
     end
 
     def to_s
       "Process\t[#{@pid}]\n" \
-        "Name\t[#{@name}]\n" \
-          "Path\t[#{@path}]\n" \
-            "Created\t[#{@created}]\n" \
-              "CmdLine\t[#{@cmd_line}]\n" \
-                "Parent\t[#{@ppid},#{parent.nil? ? '' : parent.name}]"
+      "Name\t[#{@name}]\n" \
+      "Path\t[#{@path}]\n" \
+      "Created\t[#{@created}]\n" \
+      "CmdLine\t[#{@cmd_line}]\n" \
+      "Parent\t[#{@ppid},#{parent.nil? ? '' : parent.name}]"
     end
 
     def self.running? (pid)
@@ -94,7 +92,7 @@ module AutoIt
       return nil if p.nil?
       p = p.parent
       return nil if p.nil?
-      w = p.windows.values.first
+      w = p.windows.first
       return w unless w.nil?
       containing_window(p.pid)
     end
