@@ -118,7 +118,7 @@ module AutoIt
     end
 
     def children
-      c = AutoIt::Window.all.values.select do |handle, w|
+      AutoIt::Window.all.values.select do |w|
         w.parent == self
       end
     end
@@ -204,17 +204,20 @@ module AutoIt
       states << (minimized? ? "Minimized" : nil)
       states << (maximized? ? "Maximized" : nil)
 
-      "Window\t[#{handle.to_s(16)}]\n" \
-      "Process\t[ID: #{process.pid}, Name: #{process.name}, Path: #{process.path}]\n" \
-      "Title\t[#{title.inspect}]\n" \
-      "Class\t[#{class_name}]\n" \
-      "Pos\t[#{pos.x},#{pos.y}]\n" \
-      "Size\t[#{size.w},#{size.h}]\n" \
-      "Client\t[#{client.size.w},#{client.size.h}]\n" \
-      "Text\t[#{text.inspect}]\n" \
-      "State\t[#{states.compact.join(", ")}]\n" \
-      "Parent\t[#{parent.nil? ? "" : parent.handle.to_s(16)}]\n"
-      #"Children\t[#{children}]"
+      as = ancestors.map { |a| a.handle.to_s(16) }
+      cs = children.map { |c| c.handle.to_s(16) }
+
+      "Window\t\t[#{handle.to_s(16)}]\n" \
+      "Process\t\t[ID: #{process.pid}, Name: #{process.name}, Path: #{process.path}]\n" \
+      "Title\t\t[#{title.inspect[1..-2]}]\n" \
+      "Class\t\t[#{class_name}]\n" \
+      "Pos\t\t[#{pos.x},#{pos.y}]\n" \
+      "Size\t\t[#{size.w},#{size.h}]\n" \
+      "Client\t\t[#{client.size.w},#{client.size.h}]\n" \
+      "Text\t\t[#{text.inspect[1..-2]}]\n" \
+      "State\t\t[#{states.compact.join(", ")}]\n" \
+      "Ancestors\t[#{as.join(" -> ")}]\n" \
+      "Children\t[#{cs.join(", ")}]"
     end
 
     # refresh cached window list if older than X seconds (nil to avoid refresh)

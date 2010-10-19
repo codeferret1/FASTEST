@@ -34,7 +34,57 @@ describe AutoIt::Window do
       all = AutoIt::Window::all.values.each do |w|
         s = w.to_s
         s.should_not be_empty
-        s.should match(/Window.*Process.*Title.*Pos.*Size.*Client.*Text.*State.*Parent/mi)
+        s.should match(/Window.*Process.*Title.*Pos.*Size.*Client.*Text.*State.*Ancestors.*Children/mi)
+      end
+    end
+
+    it "should have no cycles when moving up in the ancestors chain" do
+      all = AutoIt::Window::all
+      all.each do |h, w|
+        w2 = w
+        visited = [ w2.handle ]
+        while not (w2 = w2.parent).nil?
+          visited.should_not include(w2.handle)
+          visited.push(w2.handle)
+        end 
+      end
+    end
+
+    it "should not have a window whose parent is itself" do
+      all = AutoIt::Window::all
+      all.each do |h, w|
+        w.handle.should_not satisfy do |h|
+          not w.parent.nil? and w.parent.handle == h
+        end
+      end
+    end
+
+    it "should not have a process with a child as ancestor or vice-versa" do
+      all = AutoIt::Window::all
+      all.each do |h, w|
+        expand = lambda do |w, e|
+          e.should_not include(w.handle)
+          e[w.handle] = p
+          w.children.each { |c| expand.call(c, e) }
+        end
+        e = expand.call(w, {})
+      end
+    end
+
+    it "should not have unordered ancestors or not defined as the parent plus its ancestors" do
+      all = AutoIt::Window::all
+      all.each do |h, w|
+        ascend = lambda do |w|
+          w.parent.should == w.ancestors.first
+          if w.parent.nil?
+            w.ancestors.should be_empty
+          else
+            parent_ancestors = w.parent.ancestors
+            parent_ancestors.should == w.ancestors[1..-1]
+            parent_ancestors.each { |a| ascend.call(a) }
+          end
+        end
+        ascend.call(w)
       end
     end
   end
