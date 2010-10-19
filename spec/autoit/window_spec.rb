@@ -34,7 +34,7 @@ describe AutoIt::Window do
       all = AutoIt::Window::all.values.each do |w|
         s = w.to_s
         s.should_not be_empty
-        s.should match(/Window.*Process.*Title.*Pos.*Size.*Client.*Text.*State.*Ancestors.*Children/mi)
+        s.should match(/Window.*Process.*Title.*Pos.*Size.*Client.*Text.*State.*Ancestors.*Children.*Owner/mi)
       end
     end
 

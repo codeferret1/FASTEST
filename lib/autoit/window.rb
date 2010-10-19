@@ -111,9 +111,15 @@ module AutoIt
       AutoIt::COM.WinGetText(handle_filter)
     end
 
+    def owner
+      @@__User32GetWindow__ ||= Win32::API.new('GetWindow','LI','L', 'user32')
+      p = @@__User32GetWindow__.call(handle, 4)
+      p = AutoIt::Window.all[p]
+    end
+
     def parent
-      @@__User32GetParent__ ||= Win32API.new('user32','GetParent','L','L')
-      p = @@__User32GetParent__.call(handle)
+      @@__User32GetAncestor__ ||= Win32::API.new('GetAncestor','LI','L', 'user32')
+      p = @@__User32GetAncestor__.call(handle, 1)
       p = AutoIt::Window.all[p]
     end
 
@@ -217,7 +223,8 @@ module AutoIt
       "Text\t\t[#{text.inspect[1..-2]}]\n" \
       "State\t\t[#{states.compact.join(", ")}]\n" \
       "Ancestors\t[#{as.join(" -> ")}]\n" \
-      "Children\t[#{cs.join(", ")}]"
+      "Children\t[#{cs.join(", ")}]\n" \
+      "Owner\t\t[#{owner.nil? ? "" : owner.handle.to_s(16)}]"
     end
 
     # refresh cached window list if older than X seconds (nil to avoid refresh)
