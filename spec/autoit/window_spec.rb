@@ -38,6 +38,28 @@ describe AutoIt::Window do
       end
     end
 
+    it "should have top level windows with no parent defined" do
+      all = AutoIt::Window::all
+      all.each do |h, w|
+        if w.parent.nil?
+          w.should be_top_level
+        else
+          w.should_not be_top_level
+        end
+      end
+    end
+
+    it "should have owned windows with owners" do
+      all = AutoIt::Window::all
+      all.each do |h, w|
+        if w.owner.nil?
+          w.should_not be_owned
+        else
+          w.should be_owned
+        end
+      end
+    end
+
     it "should have no cycles when moving up in the ancestors chain" do
       all = AutoIt::Window::all
       all.each do |h, w|

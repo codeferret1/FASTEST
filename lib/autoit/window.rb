@@ -117,10 +117,18 @@ module AutoIt
       p = AutoIt::Window.all[p]
     end
 
+    def owned?
+      not owner.nil?
+    end
+
     def parent
       @@__User32GetAncestor__ ||= Win32::API.new('GetAncestor','LI','L', 'user32')
       p = @@__User32GetAncestor__.call(handle, 1)
       p = AutoIt::Window.all[p]
+    end
+
+    def top_level?
+      parent.nil?
     end
 
     def children
