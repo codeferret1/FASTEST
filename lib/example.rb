@@ -4,13 +4,19 @@ require File.join(File.dirname(__FILE__), 'autoit')
 before = Time.now
 
 ws = AutoIt::Window.wait_exists do |w|
-  w.process.name =~ /notepad/
+  w.process.name =~ /notepad/i 
+end
+
+def print_tree (w, level = 0)
+  puts " " * level + "[#{w.handle.to_s(16)}] [#{w.title.strip}] [#{w.class}]"
+  w.children.each do |c|
+    print_tree(c, level + 2)
+  end
 end
 
 ws.each do |w|
-  puts w
-  puts "-" * 90
-  #puts w.children.join("\n" + "c" * 80 + "\n")
+  next unless w.top_level?
+  print_tree(w)
 end
 
 #puts AutoIt::Window.wait(".process.name =~ /notepad/i", { :timeout => 3 })
