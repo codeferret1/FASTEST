@@ -95,8 +95,8 @@ module AutoIt
     def class_name
       @@__User32GetClassName__ ||= Win32::API.new('GetClassName', 'LPI', 'I', 'user32')
       tmp = "\0" * 256
-      @@__User32GetClassName__.call(handle, tmp, tmp.size - 1)
-      tmp.rstrip
+      cnt = @@__User32GetClassName__.call(handle, tmp, tmp.size - 1)
+      tmp[0...cnt]
     end
 
     def title
@@ -109,6 +109,13 @@ module AutoIt
 
     def text
       AutoIt::COM.WinGetText(handle_filter)
+    end
+
+    def menus
+      @@__User32GetMenu__ ||= Win32::API.new('GetMenu','L','L', 'user32')
+      m = @@__User32GetMenu__.call(handle)
+      return [] if m == 0
+      AutoIt::Menu.new(m).submenus
     end
 
     def owner
