@@ -6,7 +6,7 @@ Bundler.require(:default, :test)
 
 Hoe.spec 'autoit' do
   developer('Mario Freitas', 'imkira@gmail.com')
-  developer('Nicholas Green', 'FIXME')
+  developer('Nicholas Green', 'cruzmail.ngreen@gmail.com')
 end
 
 require 'rspec/core/rake_task'
