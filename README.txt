@@ -1,14 +1,16 @@
 = autoit
 
-* FIX (url)
-
 == DESCRIPTION:
 
-FIX (describe your package)
+A testing framework framework [framework]
 
 == FEATURES/PROBLEMS:
 
-* FIX (list of features or problems)
+Features:
+  Not yet
+
+Problems:
+  Abundant
 
 == SYNOPSIS:
 
@@ -16,20 +18,19 @@ FIX (describe your package)
 
 == REQUIREMENTS:
 
-* FIX (list of requirements)
+Time
+
+Money
 
 == INSTALL:
 
-* FIX (sudo gem install, anything else)
+Not recommended
 
 == DEVELOPERS:
 
 After checking out the source, run:
 
-  $ rake newb
-
-This task will install any missing dependencies, run the tests/specs,
-and generate the RDoc.
+away
 
 == LICENSE:
 
